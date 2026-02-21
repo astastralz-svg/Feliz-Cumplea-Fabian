@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Feliz Cumpleaños Fabián!</title>
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Configuración personalizada de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 5s linear infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-120vh) translateX(var(--x-offset)); opacity: 0; }
+        }
+        
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        @keyframes rainbow-text {
+            0%, 100% { color: #ff80bf; text-shadow: 0 0 20px rgba(255, 128, 191, 0.8), 2px 2px 4px rgba(0,0,0,0.5); }
+            33% { color: #ffff80; text-shadow: 0 0 20px rgba(255, 255, 128, 0.8), 2px 2px 4px rgba(0,0,0,0.5); }
+            66% { color: #80ffdf; text-shadow: 0 0 20px rgba(128, 255, 223, 0.8), 2px 2px 4px rgba(0,0,0,0.5); }
+        }
+        .animate-rainbow {
+            animation: rainbow-text 3s linear infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .wave-letter {
+            display: inline-block;
+            animation: wave 1.5s ease-in-out infinite;
+        }
+
+        .scene { display: none; }
+        .scene.active { display: flex; }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .balloon {
+            position: absolute;
+            font-size: 2.5rem;
+            pointer-events: none;
+            z-index: 50;
+            animation: floatUp 8s ease-in forwards;
+        }
+
+        .text-glow-strong {
+            filter: drop-shadow(0 0 2px rgba(0,0,0,1));
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex items-center justify-center p-4 font-sans text-white selection:bg-pink-500/30 overflow-hidden bg-slate-950">
+
+    <!-- Fondo Dinámico Animado -->
+    <div id="bg-container" class="fixed inset-0 z-0 bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/20 via-transparent to-transparent animate-pulse-slow"></div>
+    </div>
+
+    <!-- Contenedor de Confeti y Globos -->
+    <div id="effects-container" class="fixed inset-0 pointer-events-none z-[100] overflow-hidden"></div>
+
+    <!-- Música de fondo -->
+    <audio id="bg-audio" src="https://www.dropbox.com/scl/fi/quvijq7xmq1dw5kt0f594/CUMPLEA-OS-FELIZ-Canciones-infantiles.mp3?rlkey=lm1viaq54jr5juh0qtrjywa0f&st=7i3s31xp&raw=1" loop></audio>
+
+    <!-- Botón Flotante de Audio -->
+    <button id="audio-btn" onclick="toggleAudio()" class="hidden fixed top-4 right-4 z-[110] p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-white/30 transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]" title="Pausar/Reproducir Música">
+        <span id="audio-icon-wrapper"><i data-lucide="volume-x" class="w-6 h-6"></i></span>
+    </button>
+
+    <!-- Tarjeta Principal -->
+    <div class="max-w-md w-full bg-white/10 backdrop-blur-xl rounded-3xl shadow-[0_0_40px_rgba(124,58,237,0.3)] border border-white/20 overflow-y-auto overflow-x-hidden hide-scrollbar max-h-[95vh] relative z-10 transition-all duration-700">
+        
+        <!-- Botón de Retroceder (Aparece después de la portada) -->
+        <button id="back-btn" onclick="goBack()" class="hidden absolute top-4 left-4 z-[50] p-2 bg-white/5 hover:bg-white/20 rounded-xl text-white/70 hover:text-white transition-all border border-white/10">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </button>
+
+        <!-- ESCENA 0: PORTADA -->
+        <div id="scene-0" class="scene active p-8 flex-col items-center justify-center min-h-[550px] text-center">
+            <div class="relative mb-8 animate-float">
+                <div class="absolute inset-0 bg-yellow-400 blur-[40px] opacity-40 rounded-full animate-pulse"></div>
+                <i data-lucide="sparkles" class="w-24 h-24 text-yellow-300 relative z-10 drop-shadow-[0_0_15px_rgba(253,224,71,0.8)]"></i>
+            </div>
+            <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-pink-300 to-indigo-300 mb-3 drop-shadow-sm">
+                Un viaje mágico
+            </h1>
+            <p class="text-xl text-indigo-100 mb-10 font-medium italic">
+                Para el niño que pinta nuestro mundo de colores...
+            </p>
+            <button onclick="startApp()" class="group relative inline-flex items-center justify-center px-10 py-4 font-bold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-lg border border-white/20">
+                <span class="relative flex items-center gap-2 text-lg">
+                    Comenzar <i data-lucide="play" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                </span>
+            </button>
+        </div>
+
+        <!-- ESCENA 1: DESCUBRIR MAGIA -->
+        <div id="scene-1" class="scene p-8 flex-col items-center justify-center min-h-[550px] text-center">
+            <h2 class="text-3xl font-bold text-white mt-4 mb-3 drop-shadow-md flex items-center justify-center gap-2 w-full">
+                Descubre la Magia <i data-lucide="wand-2" class="w-6 h-6 text-yellow-300 animate-spin-slow"></i>
+            </h2>
+            <p class="text-indigo-200 mb-8 text-sm">Toca cada símbolo para revelar tus deseos</p>
+
+            <div class="flex flex-col gap-4 w-full mb-8">
+                <button onclick="unlockItem(0, this, 'yellow')" id="magic-0" class="magic-item flex items-center gap-4 p-4 rounded-2xl transition-all duration-500 border bg-black/20 border-white/10">
+                    <div class="icon-div p-3 rounded-full bg-white/5"><i data-lucide="star" class="w-7 h-7 text-gray-400"></i></div>
+                    <span class="desc-text text-left font-medium text-sm opacity-0 text-yellow-100 transition-opacity">Amor infinito en cada uno de sus pasitos.</span>
+                </button>
+                <button onclick="unlockItem(1, this, 'pink')" id="magic-1" class="magic-item flex items-center gap-4 p-4 rounded-2xl transition-all duration-500 border bg-black/20 border-white/10">
+                    <div class="icon-div p-3 rounded-full bg-white/5"><i data-lucide="heart" class="w-7 h-7 text-gray-400"></i></div>
+                    <span class="desc-text text-left font-medium text-sm opacity-0 text-pink-100 transition-opacity">Risas contagiosas que alegran el alma.</span>
+                </button>
+                <button onclick="unlockItem(2, this, 'purple')" id="magic-2" class="magic-item flex items-center gap-4 p-4 rounded-2xl transition-all duration-500 border bg-black/20 border-white/10">
+                    <div class="icon-div p-3 rounded-full bg-white/5"><i data-lucide="gift" class="w-7 h-7 text-gray-400"></i></div>
+                    <span class="desc-text text-left font-medium text-sm opacity-0 text-purple-100 transition-opacity">Salud, protección y un mundo hermoso.</span>
+                </button>
+            </div>
+
+            <div id="scene-1-next" class="transition-all duration-700 opacity-0 translate-y-4 pointer-events-none">
+                <button onclick="goToStep(2)" class="px-8 py-3 bg-white/20 text-white font-bold rounded-full border border-white/40 hover:bg-white/30 transition-all flex items-center gap-2 backdrop-blur-sm">
+                    Leer el mensaje <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ESCENA 2: LA CARTA -->
+        <div id="scene-2" class="scene p-8 flex-col items-center justify-center min-h-[550px] text-center relative">
+            <div class="w-full text-left space-y-5 text-indigo-50 leading-relaxed mt-6">
+                <p class="text-[10px] font-bold tracking-[0.3em] text-pink-400 uppercase text-center mb-4">21 DE FEBRERO DE 2026</p>
+                <h2 class="text-3xl font-black text-center text-white mb-6">Mi querido Fabián,</h2>
+                <p class="text-lg opacity-0 translate-y-4 transition-all duration-700" id="text-p1">
+                    Hace exactamente dos añitos llegaste a este mundo, tan pequeñito pero con una luz tan inmensa que iluminaste toda nuestra vida de golpe. ✨
+                </p>
+                <p class="text-lg opacity-0 translate-y-4 transition-all duration-700" id="text-p2">
+                    Hoy cumples 2 años. Ver cómo tus manitas lo exploran todo, cómo tus ojitos brillan con curiosidad y escuchar tus carcajadas... es el regalo más grande.
+                </p>
+                <div class="mt-6 p-4 bg-gradient-to-r from-pink-500/20 to-purple-600/20 rounded-2xl border border-white/10 text-center opacity-0 scale-95 transition-all duration-700" id="text-quote">
+                    <p class="font-bold text-yellow-200 text-lg italic">¡Feliz vida, nuestro campeón hermoso!</p>
+                </div>
+            </div>
+            <button onclick="goToStep(3)" class="mt-10 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold rounded-full shadow-lg border border-pink-300/50 transition-all animate-bounce flex items-center gap-2">
+                Ver tus recuerdos <i data-lucide="camera" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- ESCENA 3: GALERÍA -->
+        <div id="scene-3" class="scene p-8 flex-col items-center justify-center min-h-[550px] text-center relative overflow-hidden">
+            <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-300 mb-8 mt-4">Tu Crecimiento</h2>
+            
+            <div class="relative w-full aspect-[4/5] mb-10 flex justify-center items-center">
+                <div class="memory-card absolute w-full h-full transition-all duration-1000 transform z-30 opacity-100">
+                    <div class="w-full h-full bg-white p-3 pb-8 rounded-xl shadow-2xl flex flex-col border border-gray-100 rotate-[-2deg]">
+                        <div class="flex-1 w-full overflow-hidden rounded bg-slate-50 flex items-center justify-center">
+                            <img src="https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/641027590_122189960036543679_7333208099152097611_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=13d280&_nc_ohc=VNFUO50QWFcQ7kNvwGSuePU&_nc_oc=AdmWPkBnTczHKsdCGgElSStvoDjPCfQ8zZd4lwLKQzKDD92JwptcwLWWf3TEMiX5OuQOYP5UONMpuBtHn1rYb-xx&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=zcgF-_qdYP2vcp7Q9zUaFw&oh=00_Aftc1J7KLAXnhroOXmFaVVuoY9yt0zhTcVpLGCvNbWnC_A&oe=699F1651" class="w-full h-full object-cover" />
+                        </div>
+                        <p class="text-gray-700 font-serif italic mt-4 px-2 text-sm">"Tus primeros días llenos de ternura..."</p>
+                    </div>
+                </div>
+                <div class="memory-card absolute w-full h-full transition-all duration-1000 transform z-0 opacity-0 translate-x-12 rotate-6 blur-md">
+                    <div class="w-full h-full bg-white p-3 pb-8 rounded-xl shadow-2xl flex flex-col border border-gray-100">
+                        <div class="flex-1 w-full overflow-hidden rounded bg-indigo-50/30 flex items-center justify-center">
+                            <img src="https://scontent.fmga3-2.fna.fbcdn.net/v/t39.30808-6/639618156_122189960144543679_165347372722712984_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=13d280&_nc_ohc=aEH7ZlaKDdUQ7kNvwGb4ZWg&_nc_oc=AdkS7j1yOAhIjoROIecI1HxRtTT6j_uwmUEjoPNKt8fYvRtn8ckcrLHnas38yAhLJB0fj6tScXas-pBV55EbJ_47&_nc_zt=23&_nc_ht=scontent.fmga3-2.fna&_nc_gid=GeZ6-BLdQyB0isP6hzxAPw&oh=00_Afst20Fxid_OcE7avb9zQ57CWRQ6VEDL3X0OV76xcyfdoQ&oe=699F0D13" class="w-full h-full object-contain" />
+                        </div>
+                        <p class="text-gray-700 font-serif italic mt-4 px-2 text-sm">"Sonrisas que derriten corazones."</p>
+                    </div>
+                </div>
+                <div class="memory-card absolute w-full h-full transition-all duration-1000 transform z-0 opacity-0 translate-x-12 rotate-6 blur-md">
+                    <div class="w-full h-full bg-white p-3 pb-8 rounded-xl shadow-2xl flex flex-col border border-gray-100 rotate-[3deg]">
+                        <div class="flex-1 w-full overflow-hidden rounded bg-slate-50 flex items-center justify-center">
+                            <img src="https://scontent.fmga11-2.fna.fbcdn.net/v/t39.30808-6/639730324_122189960228543679_8022215456395875610_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=13d280&_nc_ohc=j0xFlFvUnAAQ7kNvwHHvuFq&_nc_oc=AdnTQqqHKNiUBIFL6XqndQPMsFq_zO6bJzpo0lCe3LLElccP8CqhtmeXYlwLwz-IieE506Ih1lpCL9tAMi4c_Z4s&_nc_zt=23&_nc_ht=scontent.fmga11-2.fna&_nc_gid=xYnqyuyoxwWuVHDJ0vZLZQ&oh=00_AfuwTq3T21NHdnFsoT_xhlLDasIAxJAVGd4M0n9gAZ6WpQ&oe=699F233B" class="w-full h-full object-cover" />
+                        </div>
+                        <p class="text-gray-700 font-serif italic mt-4 px-2 text-sm">"Tus pasitos firmes y valientes."</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scene-3-next" class="opacity-0 translate-y-4 transition-all duration-700 pointer-events-none">
+                <button onclick="goToStep(4)" class="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-full shadow-lg flex items-center gap-2 animate-bounce">
+                    ¡A festejar! <i data-lucide="cake" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ESCENA 4: EL PASTEL FINAL -->
+        <div id="scene-4" class="scene p-8 flex-col items-center justify-center min-h-[550px] text-center relative">
+            <h2 class="text-4xl font-black text-white mb-2 mt-4 drop-shadow-lg">¡Felices 2!</h2>
+            <h3 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-300 mb-8 animate-pulse">FABIÁN 🎈</h3>
+
+            <p id="cake-hint" class="text-indigo-200 mb-8 text-sm h-5 font-medium">Toca las velas para pedir tu deseo...</p>
+
+            <div class="relative mb-12 group scale-110 flex flex-col items-center">
+                <div class="flex justify-center gap-8 mb-[-10px] z-10 relative w-full">
+                    <div onclick="blowCandle(0, this)" class="candle relative cursor-pointer group-active:scale-95 transition-transform">
+                        <div class="flame absolute -top-8 left-1/2 -translate-x-1/2 w-4 h-6 bg-orange-500 rounded-full blur-[2px] animate-pulse"></div>
+                        <div class="flame absolute -top-7 left-1/2 -translate-x-1/2 w-2 h-4 bg-yellow-100 rounded-full shadow-[0_0_15px_gold]"></div>
+                        <div class="w-4 h-12 bg-blue-400 rounded-t-sm border border-white/20"></div>
+                    </div>
+                    <div onclick="blowCandle(1, this)" class="candle relative cursor-pointer group-active:scale-95 transition-transform">
+                        <div class="flame absolute -top-8 left-1/2 -translate-x-1/2 w-4 h-6 bg-orange-500 rounded-full blur-[2px] animate-pulse"></div>
+                        <div class="flame absolute -top-7 left-1/2 -translate-x-1/2 w-2 h-4 bg-yellow-100 rounded-full shadow-[0_0_15px_gold]"></div>
+                        <div class="w-4 h-12 bg-pink-400 rounded-t-sm border border-white/20"></div>
+                    </div>
+                </div>
+                <div class="w-48 h-20 bg-amber-100 rounded-t-2xl border-4 border-white/80 shadow-2xl relative">
+                    <div class="absolute top-0 left-0 w-full h-6 bg-pink-400/80 rounded-t-xl"></div>
+                </div>
+                <div class="w-56 h-6 bg-white/30 backdrop-blur-sm rounded-full mt-[-8px] border border-white/20"></div>
+            </div>
+
+            <div id="final-block" class="opacity-0 scale-90 translate-y-8 transition-all duration-1000 pointer-events-none flex flex-col items-center">
+                <div class="text-4xl font-black mb-8 tracking-widest leading-relaxed text-glow-strong">
+                    <span class="wave-letter animate-rainbow" style="animation-delay: 0.1s">T</span>
+                    <span class="wave-letter animate-rainbow" style="animation-delay: 0.2s">E</span>
+                    <span class="mx-2"></span>
+                    <span class="wave-letter animate-rainbow" style="animation-delay: 0.3s">A</span>
+                    <span class="wave-letter animate-rainbow" style="animation-delay: 0.4s">M</span>
+                    <span class="wave-letter animate-rainbow" style="animation-delay: 0.5s">A</span>
+                    <span class="wave-letter animate-rainbow" style="animation-delay: 0.6s">M</span>
+                    <span class="wave-letter animate-rainbow" style="animation-delay: 0.7s">O</span>
+                    <span class="wave-letter animate-rainbow" style="animation-delay: 0.8s">S</span>
+                    <br/>
+                    <span class="text-2xl font-extrabold text-pink-100 drop-shadow-lg">MUCHÍSIMO ❤️</span>
+                </div>
+                <button onclick="restartExperience()" class="px-6 py-2 bg-white/10 hover:bg-white/20 text-indigo-100 text-sm font-bold rounded-full border border-white/30 transition-all flex items-center gap-2 backdrop-blur-md shadow-lg">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Volver a empezar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentStep = 0;
+
+        // Fondo Estrellado
+        const bg = document.getElementById('bg-container');
+        for (let i = 0; i < 40; i++) {
+            let s = document.createElement('div');
+            s.className = 'absolute bg-white/40 rounded-full blur-[1px]';
+            let size = Math.random() * 3 + 1;
+            s.style.width = size + 'px';
+            s.style.height = size + 'px';
+            s.style.left = Math.random() * 100 + '%';
+            s.style.bottom = '-10%';
+            s.style.setProperty('--x-offset', (Math.random() - 0.5) * 50 + 'px');
+            s.style.animation = `floatUp ${Math.random() * 8 + 7}s linear ${Math.random() * 5}s infinite`;
+            bg.appendChild(s);
+        }
+
+        const audio = document.getElementById('bg-audio');
+        let isPlaying = false;
+
+        function toggleAudio() {
+            const btnWrapper = document.getElementById('audio-icon-wrapper');
+            if(isPlaying) { 
+                audio.pause(); 
+                btnWrapper.innerHTML = '<i data-lucide="play-circle" class="w-6 h-6"></i>'; 
+            } else { 
+                audio.play(); 
+                btnWrapper.innerHTML = '<i data-lucide="pause-circle" class="w-6 h-6"></i>'; 
+            }
+            isPlaying = !isPlaying;
+            lucide.createIcons();
+        }
+
+        function startApp() {
+            goToStep(1);
+            audio.play().then(() => {
+                isPlaying = true;
+                document.getElementById('audio-btn').classList.remove('hidden');
+                document.getElementById('audio-icon-wrapper').innerHTML = '<i data-lucide="pause-circle" class="w-6 h-6"></i>';
+                lucide.createIcons();
+            }).catch(() => {
+                // Si falla el autoplay, mostramos el botón de todos modos para que el usuario active manual
+                document.getElementById('audio-btn').classList.remove('hidden');
+                lucide.createIcons();
+            });
+        }
+
+        function goToStep(step) {
+            currentStep = step;
+            document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+            document.getElementById(`scene-${step}`).classList.add('active');
+            
+            // Mostrar/Ocultar botón de Atrás
+            const backBtn = document.getElementById('back-btn');
+            if(step > 0) backBtn.classList.remove('hidden');
+            else backBtn.classList.add('hidden');
+
+            // Resetear animaciones de texto en escena 2
+            if(step === 2) {
+                const p1 = document.getElementById('text-p1');
+                const p2 = document.getElementById('text-p2');
+                const q = document.getElementById('text-quote');
+                p1.classList.add('opacity-0', 'translate-y-4');
+                p2.classList.add('opacity-0', 'translate-y-4');
+                q.classList.add('opacity-0', 'scale-95');
+                
+                setTimeout(() => p1.classList.remove('opacity-0', 'translate-y-4'), 300);
+                setTimeout(() => p2.classList.remove('opacity-0', 'translate-y-4'), 800);
+                setTimeout(() => q.classList.remove('opacity-0', 'scale-95'), 1400);
+            }
+            
+            if(step === 3) startCarousel();
+            else if(memInt) clearInterval(memInt); // Parar carrusel si salimos de la escena 3
+
+            lucide.createIcons();
+        }
+
+        function goBack() {
+            if(currentStep > 0) {
+                goToStep(currentStep - 1);
+            }
+        }
+
+        let unlocked = [false, false, false];
+        function unlockItem(idx, el, color) {
+            if(unlocked[idx]) return;
+            unlocked[idx] = true;
+            el.classList.add('bg-white/20', color === 'yellow' ? 'border-yellow-300' : (color === 'pink' ? 'border-pink-300' : 'border-purple-300'));
+            el.querySelector('.desc-text').classList.replace('opacity-0', 'opacity-100');
+            const icon = el.querySelector('.lucide');
+            icon.classList.remove('text-gray-400');
+            icon.classList.add('fill-current', color === 'yellow' ? 'text-yellow-300' : (color === 'pink' ? 'text-pink-400' : 'text-purple-400'));
+            
+            if(unlocked.every(v => v)) {
+                const n = document.getElementById('scene-1-next');
+                n.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+            }
+        }
+
+        let curMem = 0;
+        let memInt;
+        function updateMemories() {
+            const cards = document.querySelectorAll('.memory-card');
+            cards.forEach((c, i) => {
+                c.style.transition = "all 1s cubic-bezier(0.4, 0, 0.2, 1)";
+                if(i === curMem) {
+                    c.className = "memory-card absolute w-full h-full transform z-30 opacity-100 scale-100 blur-none rotate-0";
+                } else if (i < curMem) {
+                    c.className = "memory-card absolute w-full h-full transform z-0 opacity-0 -translate-x-full rotate-[-15deg] blur-md";
+                } else {
+                    c.className = "memory-card absolute w-full h-full transform z-0 opacity-0 translate-x-12 rotate-6 blur-lg";
+                }
+            });
+            if(curMem === cards.length - 1) {
+                document.getElementById('scene-3-next').classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+            }
+        }
+
+        function startCarousel() {
+            curMem = 0;
+            updateMemories();
+            if(memInt) clearInterval(memInt);
+            memInt = setInterval(() => {
+                const cards = document.querySelectorAll('.memory-card');
+                if(curMem < cards.length - 1) { 
+                    curMem++; 
+                    updateMemories(); 
+                } else {
+                    clearInterval(memInt);
+                }
+            }, 5500);
+        }
+
+        let lit = [true, true];
+        let celebrationIntervals = [];
+
+        function blowCandle(idx, el) {
+            if(!lit[idx]) return;
+            lit[idx] = false;
+            el.querySelectorAll('.flame').forEach(f => f.classList.add('opacity-0', 'scale-0'));
+            
+            if(!lit.includes(true)) {
+                document.getElementById('cake-hint').textContent = "¡Deseo concedido! ✨";
+                const fb = document.getElementById('final-block');
+                fb.classList.remove('opacity-0', 'scale-90', 'translate-y-8', 'pointer-events-none');
+                triggerCelebration();
+            }
+        }
+
+        function triggerCelebration() {
+            const cont = document.getElementById('effects-container');
+            // Detener intervalos previos si existen
+            celebrationIntervals.forEach(clearInterval);
+            celebrationIntervals = [];
+
+            const confettiInterval = setInterval(() => {
+                let c = document.createElement('div');
+                c.className = 'absolute top-[-5%]';
+                c.style.left = Math.random() * 100 + '%';
+                c.style.width = Math.random() * 10 + 4 + 'px';
+                c.style.height = c.style.width;
+                c.style.backgroundColor = ['#ff007f', '#ffff00', '#00ffff', '#7f00ff', '#fde047', '#60a5fa'][Math.floor(Math.random()*6)];
+                c.style.animation = `fall ${Math.random()*3 + 3}s linear forwards`;
+                cont.appendChild(c);
+                setTimeout(() => c.remove(), 6000);
+            }, 150);
+
+            const balloonInterval = setInterval(() => {
+                const emojis = ['🎈', '✨', '🎂', '🥳', '💖', '🧸', '🌈', '🍭'];
+                let b = document.createElement('div');
+                b.className = 'balloon';
+                b.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+                b.style.left = (Math.random() * 85 + 5) + '%';
+                b.style.bottom = '-10%';
+                b.style.setProperty('--x-offset', (Math.random()-0.5)*150 + 'px');
+                cont.appendChild(b);
+                setTimeout(() => b.remove(), 8500);
+            }, 1200);
+
+            celebrationIntervals.push(confettiInterval, balloonInterval);
+        }
+
+        function restartExperience() {
+            celebrationIntervals.forEach(clearInterval);
+            celebrationIntervals = [];
+            unlocked = [false, false, false];
+            lit = [true, true];
+            curMem = 0;
+            document.getElementById('effects-container').innerHTML = '';
+            
+            // Reset items magia
+            document.querySelectorAll('.magic-item').forEach(el => {
+                el.className = 'magic-item flex items-center gap-4 p-4 rounded-2xl transition-all duration-500 border bg-black/20 border-white/10';
+                el.querySelector('.desc-text').classList.replace('opacity-100', 'opacity-0');
+                const icon = el.querySelector('.lucide');
+                icon.className = 'lucide text-gray-400 w-7 h-7';
+            });
+            document.getElementById('scene-1-next').classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+            
+            // Reset Velas
+            document.querySelectorAll('.candle .flame').forEach(f => f.classList.remove('opacity-0', 'scale-0'));
+            document.getElementById('final-block').classList.add('opacity-0', 'scale-90', 'translate-y-8', 'pointer-events-none');
+            document.getElementById('cake-hint').textContent = "Toca las velas para pedir tu deseo...";
+            
+            goToStep(0);
+        }
+    </script>
+</body>
+</html>
